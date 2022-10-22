@@ -1,10 +1,12 @@
-#!/usr/bin/env bash
+#!/bin/bash
+
+export $(grep -v '^#' ~/.gh_token | xargs -0)
 
 #####################################################################
 ### Please set the paths accordingly. In case you don't have all  ###
 ### the listed folders, just keep that line commented out.        ###
 #####################################################################
-### Path to your config folder you want to back up
+### Path to your config folder you want to backup
 config_folder=~/klipper_config
 
 ### Path to your Klipper folder, by default that is '~/klipper'
@@ -26,35 +28,46 @@ mainsail_folder=~/mainsail
 #####################################################################
 ################ !!! DO NOT EDIT BELOW THIS LINE !!! ################
 #####################################################################
-grab_version() {
-  local klipper_commit moonraker_commit
-  local mainsail_ver fluidd_ver
-
-  if [[ -n ${klipper_folder} ]]; then
-    cd "${klipper_folder}"
+grab_version(){
+  if [ ! -z "$klipper_folder" ]; then
+    echo -n "Getting klipper version="
+    cd "$klipper_folder"
     klipper_commit=$(git rev-parse --short=7 HEAD)
-    m1="Klipper on commit: ${klipper_commit}"
+    m1="Klipper on commit: $klipper_commit"
+    echo $klipper_commit
+    cd ..
   fi
-  if [[ -n ${moonraker_folder} ]]; then
-    cd "${moonraker_folder}"
+  if [ ! -z "$moonraker_folder" ]; then
+    echo -n "Getting moonraker version="
+    cd "$moonraker_folder"
     moonraker_commit=$(git rev-parse --short=7 HEAD)
-    m2="Moonraker on commit: ${moonraker_commit}"
+    m2="Moonraker on commit: $moonraker_commit"
+    echo $moonraker_commit
+    cd ..
   fi
-  if [[ -n ${mainsail_folder} ]]; then
-    mainsail_ver=$(head -n 1 "${mainsail_folder}/.version")
-    m3="Mainsail version: ${mainsail_ver}"
+  if [ ! -z "$mainsail_folder" ]; then
+    echo -n "Getting mainsail version="
+    mainsail_ver=$(head -n 1 $mainsail_folder/.version)
+    m3="Mainsail version: $mainsail_ver"
+    echo $mainsail_ver
+  fi
+  if [ ! -z "$fluidd_folder" ]; then
+    echo -n "Getting fluidd version="
+    fluidd_ver=$(head -n 1 $fluidd_folder/.version)
+    m4="Fluidd version: $fluidd_ver"
+    echo $fluidd_ver
   fi
 }
 
-push_config() {
-  local current_date
-  
-  cd "${config_folder}" || exit 1
-  git pull
-  git add .
+push_config(){
+  cd $config_folder
+  echo Pushing updates
+  git pull -v
+  git add . -v
   current_date=$(date +"%Y-%m-%d %T")
-  git commit -m "Autocommit from ${current_date}" -m "${m1}" -m "${m2}" -m "${m3}" -m "${m4}"
-  git push
+  git commit -m "Backup triggered on $current_date" -m "$m1" -m "$m2" -m "$m3" -m "$m4"
+#  git push "https://voronpi:$GH_TOKEN@github.com/richardjm/voronpi-klipper-backup.git"
+  git push "git@github.com:richardjm/voronpi-klipper-backup.git"
 }
 
 grab_version
