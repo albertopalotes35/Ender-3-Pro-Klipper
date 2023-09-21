@@ -33,6 +33,7 @@ repo = cadriel/fluidd
 path = ~/fluidd
 
 [file_manager]
+enable_object_processing = True
 
 [data_store]
 temperature_store_size = 600
