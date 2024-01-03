@@ -23,6 +23,7 @@ trusted_clients =
 	192.168.0.0/16
 	FE80::/10
 	::1/128
+	127.0.0.1
 
 [octoprint_compat]
 
@@ -45,9 +46,16 @@ gcode_store_size = 1000
 
 [update_manager KlipperScreen]
 type = git_repo
-path = /home/pi/KlipperScreen
-origin = https://github.com/jordanruthe/KlipperScreen.git
-env = /home/pi/.KlipperScreen-env/bin/python
+path = ~/KlipperScreen
+origin = https://github.com/KlipperScreen/KlipperScreen.git
+virtualenv = ~/.KlipperScreen-env
 requirements = scripts/KlipperScreen-requirements.txt
-install_script = scripts/KlipperScreen-install.sh
+system_dependencies = scripts/system-dependencies.json
+managed_services = KlipperScreen
+
+[update_manager mainsail]
+type = web
+channel = stable
+repo = mainsail-crew/mainsail
+path = ~/mainsail
 
